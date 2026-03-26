@@ -1,4 +1,4 @@
-name: Super Final Build
+name: Guaranteed APK Build
 on: [push, workflow_dispatch]
 
 jobs:
@@ -23,24 +23,23 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Install Critical Tools
+      - name: Prepare Environment
         run: |
           python -m pip install --upgrade pip
-          # تسطيب flet النسخة المستقرة و telethon
-          pip install flet telethon==1.24.0 pyaes
+          # تسطيب المكتبات بنسخ "متوافقة" يدوياً بعيداً عن الملفات القديمة
+          pip install flet telethon==1.24.0 pyaes pyasn1 rsa
 
-      - name: Build APK (The Silent Way)
+      - name: Build APK (Force Mode)
         run: |
-          # الموافقة على الرخص بطريقة صامتة ومضمونة
+          # تخطي الرخص بطريقة "إجبارية" للسيرفر
           mkdir -p $ANDROID_HOME/licenses
-          echo "24333f8a63b6825ea9c5573f43592f4d23b1622e" > $ANDROID_HOME/licenses/android-sdk-license
-          echo "8933bad161af4178b1185d1a37fbf41ea5269c55" >> $ANDROID_HOME/licenses/android-sdk-license
+          echo -e "\n24333f8a63b6825ea9c5573f43592f4d23b1622e" > $ANDROID_HOME/licenses/android-sdk-license
           
-          # بناء التطبيق مع تجاهل تحذيرات الـ Doctor
+          # أمر البناء الصافي
           flet build apk --verbose
 
-      - name: Upload APK
+      - name: Upload Finished APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-final-version
+          name: Saud-Telegram-App
           path: build/apk/*.apk
