@@ -1,4 +1,4 @@
-name: Ultimate Success Build
+name: Final Ultimate Build
 on: [push, workflow_dispatch]
 
 jobs:
@@ -7,29 +7,36 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
-          python-version: '3.10'
+          channel: 'stable'
 
-      - name: Install Flet
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flet telethon==1.24.0 pyaes
+          pip install flet telethon pyaes pyasn1 rsa
 
-      - name: Build APK (The "Yes" Mode)
+      - name: Build APK
         run: |
-          # السطر السحري: بنقول للسيرفر وافق على كل حاجة أوتوماتيك
+          # الموافقة على الرخص غصب عن السيرفر
+          yes | flutter doctor --android-licenses || true
+          # البناء مع تجاهل أي أسئلة
           yes | flet build apk --verbose
 
-      - name: Upload
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: saud-app-v1
+          name: Saud-Final-App
           path: build/apk/*.apk
