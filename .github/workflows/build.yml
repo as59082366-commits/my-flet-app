@@ -1,4 +1,4 @@
-name: Final Build APK
+name: Final Ultimate Build
 on: [push, workflow_dispatch]
 
 jobs:
@@ -23,21 +23,21 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Accept Android Licenses
-        run: |
-          yes | sdkmanager --licenses
-
-      - name: Install Dependencies
+      - name: Install Tools & Dependencies
         run: |
           python -m pip install --upgrade pip
+          # تسطيب المكتبات بشكل يمنع أي تعارض
           pip install flet telethon pyaes
 
       - name: Build APK
         run: |
+          # الموافقة على الرخص من خلال فلاتر مباشرة
+          yes | flutter doctor --android-licenses
+          # بناء التطبيق
           flet build apk --verbose
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: my-app
+          name: my-telegram-app
           path: build/apk/*.apk
