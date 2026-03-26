@@ -23,20 +23,21 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Install Tools
+      - name: Accept Android Licenses
+        run: |
+          yes | sdkmanager --licenses
+
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flet telethon==1.24.0
+          pip install flet telethon pyaes
 
-      - name: Clean and Build APK
+      - name: Build APK
         run: |
-          # تنظيف أي مخلفات قديمة
-          rm -rf build
-          # أمر البناء مع إظهار كل التفاصيل عشان لو وقف نعرف ليه
           flet build apk --verbose
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: my-final-app
+          name: my-app
           path: build/apk/*.apk
