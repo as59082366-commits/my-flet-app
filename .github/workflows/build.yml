@@ -1,9 +1,11 @@
-name: Final Ultimate Build
+name: Build Windows EXE
 on: [push, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    # بنستخدم سيرفر ويندوز عشان نضمن التوافق 100%
+    runs-on: windows-latest 
+
     steps:
       - uses: actions/checkout@v4
 
@@ -12,31 +14,18 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flet telethon pyaes pyasn1 rsa
+          pip install -r requirements.txt
 
-      - name: Build APK
+      - name: Packaging App to EXE
         run: |
-          # الموافقة على الرخص غصب عن السيرفر
-          yes | flutter doctor --android-licenses || true
-          # البناء مع تجاهل أي أسئلة
-          yes | flet build apk --verbose
+          # أمر التحويل لملف EXE واحد
+          flet pack main.py --name "SaoudApp"
 
-      - name: Upload APK
+      - name: Upload Result
         uses: actions/upload-artifact@v4
         with:
-          name: Saud-Final-App
-          path: build/apk/*.apk
+          name: Saoud-Windows-EXE
+          path: dist/*.exe
