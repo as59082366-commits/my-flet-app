@@ -1,4 +1,4 @@
-name: Guaranteed APK Build
+name: Final Success Build
 on: [push, workflow_dispatch]
 
 jobs:
@@ -7,39 +7,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.10'
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
+          flutter-version: '3.22.0' # نسخة مستقرة جداً مع Flet
           channel: 'stable'
 
-      - name: Prepare Environment
+      - name: Install Flet
         run: |
           python -m pip install --upgrade pip
-          # تسطيب المكتبات بنسخ "متوافقة" يدوياً بعيداً عن الملفات القديمة
-          pip install flet telethon==1.24.0 pyaes pyasn1 rsa
+          pip install flet
 
-      - name: Build APK (Force Mode)
+      - name: Global Fix for Android Licenses
         run: |
-          # تخطي الرخص بطريقة "إجبارية" للسيرفر
+          # ده السطر اللي هيخلي assembleRelease تنجح غصب عنها
           mkdir -p $ANDROID_HOME/licenses
-          echo -e "\n24333f8a63b6825ea9c5573f43592f4d23b1622e" > $ANDROID_HOME/licenses/android-sdk-license
-          
-          # أمر البناء الصافي
+          echo -e "24333f8a63b6825ea9c5573f43592f4d23b1622e\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb74abc367d3441ff9d4\n2fb8283922314293301347648f430635f284e1b3" > $ANDROID_HOME/licenses/android-sdk-license
+
+      - name: Build APK
+        run: |
+          # أمر البناء المباشر
           flet build apk --verbose
 
-      - name: Upload Finished APK
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: Saud-Telegram-App
+          name: my-app-apk
           path: build/apk/*.apk
