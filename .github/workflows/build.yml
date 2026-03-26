@@ -1,4 +1,4 @@
-name: Final Success Build
+name: Ultimate Success Build
 on: [push, workflow_dispatch]
 
 jobs:
@@ -18,30 +18,18 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.22.0' # نسخة مستقرة جداً مع Flet
-          channel: 'stable'
-
       - name: Install Flet
         run: |
           python -m pip install --upgrade pip
-          pip install flet
+          pip install flet telethon==1.24.0 pyaes
 
-      - name: Global Fix for Android Licenses
+      - name: Build APK (The "Yes" Mode)
         run: |
-          # ده السطر اللي هيخلي assembleRelease تنجح غصب عنها
-          mkdir -p $ANDROID_HOME/licenses
-          echo -e "24333f8a63b6825ea9c5573f43592f4d23b1622e\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb74abc367d3441ff9d4\n2fb8283922314293301347648f430635f284e1b3" > $ANDROID_HOME/licenses/android-sdk-license
-
-      - name: Build APK
-        run: |
-          # أمر البناء المباشر
-          flet build apk --verbose
+          # السطر السحري: بنقول للسيرفر وافق على كل حاجة أوتوماتيك
+          yes | flet build apk --verbose
 
       - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: my-app-apk
+          name: saud-app-v1
           path: build/apk/*.apk
